@@ -135,38 +135,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  position: relative;
-  overflow: hidden;
-}
-
-.timer-card > * {
-  position: relative;
-  z-index: 1;
-}
-
-.timer-square {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  transform: rotate(-90deg);
-  z-index: 0;
-}
-
-.timer-square-bg {
-  fill: transparent;
-  stroke: rgba(148, 163, 184, 0.25);
-  stroke-width: 6;
-}
-
-.timer-square-progress {
-  fill: transparent;
-  stroke: url(#timerSquareGradient);
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  filter: drop-shadow(0 0 16px rgba(248, 113, 113, 0.45));
 }
 
 .mode-tabs {
@@ -234,6 +202,7 @@ body {
 }
 
 .timer-face {
+  --timer-ring-width: 7px;
   position: absolute;
   inset: var(--timer-inner-inset);
   border-radius: 50%;
@@ -245,6 +214,38 @@ body {
   display: grid;
   place-items: center;
   overflow: hidden;
+}
+
+.timer-ring-track,
+.timer-ring-progress {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.timer-ring-track {
+  border: var(--timer-ring-width) solid rgba(148, 163, 184, 0.32);
+}
+
+.timer-ring-progress {
+  padding: var(--timer-ring-width);
+  background: conic-gradient(
+    from -90deg,
+    #fee2e2 0deg,
+    #fb4d3d var(--timer-ring-progress-mid),
+    #1d4ed8 var(--timer-ring-progress),
+    transparent var(--timer-ring-progress)
+  );
+  filter: drop-shadow(0 0 16px rgba(248, 113, 113, 0.5));
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
 }
 
 .timer-time {

@@ -18,9 +18,6 @@ const MODES = {
   LONG_BREAK: "long_break",
 };
 
-const CARD_RING_STROKE_WIDTH = 6;
-const CARD_RING_RADIUS = 32;
-
 function loadSettings() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -120,11 +117,9 @@ function PomodoroApp() {
   const [wakeLockStatus, setWakeLockStatus] = useState(
     "Status: waiting for timer"
   );
-  const [timerCardBox, setTimerCardBox] = useState({ width: 0, height: 0 });
 
   const intervalRef = useRef(null);
   const wakeLockRef = useRef(null);
-  const timerCardRef = useRef(null);
 
   const cycleIndex =
     (completedFocusSessions % settings.sessionsPerCycle) + 1;
@@ -144,16 +139,8 @@ function PomodoroApp() {
     const progress = remainingSeconds / totalSeconds;
     return Math.min(Math.max(progress, 0), 1);
   })();
-  const cardRingInset = CARD_RING_STROKE_WIDTH / 2;
-  const cardRingWidth = Math.max(timerCardBox.width - CARD_RING_STROKE_WIDTH, 0);
-  const cardRingHeight = Math.max(timerCardBox.height - CARD_RING_STROKE_WIDTH, 0);
-  const cardRingPerimeter =
-    timerCardBox.width > 0 && timerCardBox.height > 0
-      ? 2 * Math.max(cardRingWidth - CARD_RING_RADIUS * 2, 0) +
-        2 * Math.max(cardRingHeight - CARD_RING_RADIUS * 2, 0) +
-        2 * Math.PI * CARD_RING_RADIUS
-      : 0;
-  const ringDashOffset = cardRingPerimeter * (1 - ringProgress);
+  const ringProgressDegrees = ringProgress * 360;
+  const ringProgressMidDegrees = ringProgress * 220;
 
   async function requestWakeLock() {
     if (!("wakeLock" in navigator)) {
@@ -200,27 +187,6 @@ function PomodoroApp() {
       }
     }
   }
-
-  useEffect(() => {
-    const node = timerCardRef.current;
-    if (!node || typeof ResizeObserver === "undefined") return;
-
-    const updateBox = () => {
-      setTimerCardBox({
-        width: node.clientWidth,
-        height: node.clientHeight,
-      });
-    };
-
-    updateBox();
-
-    const observer = new ResizeObserver(() => {
-      updateBox();
-    });
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (typeof Notification === "undefined") return;
@@ -412,47 +378,7 @@ function PomodoroApp() {
         <section
           className="timer-card"
           aria-label="Pomodoro timer"
-          ref={timerCardRef}
         >
-          {timerCardBox.width > 0 && timerCardBox.height > 0 && (
-            <svg
-              className="timer-square"
-              viewBox={`0 0 ${timerCardBox.width} ${timerCardBox.height}`}
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <defs>
-                <linearGradient id="timerSquareGradient" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#fee2e2" />
-                  <stop offset="45%" stopColor="#fb4d3d" />
-                  <stop offset="100%" stopColor="#1d4ed8" />
-                </linearGradient>
-              </defs>
-              <rect
-                className="timer-square-bg"
-                x={cardRingInset}
-                y={cardRingInset}
-                width={cardRingWidth}
-                height={cardRingHeight}
-                rx={CARD_RING_RADIUS}
-                ry={CARD_RING_RADIUS}
-              />
-              <rect
-                className="timer-square-progress"
-                x={cardRingInset}
-                y={cardRingInset}
-                width={cardRingWidth}
-                height={cardRingHeight}
-                rx={CARD_RING_RADIUS}
-                ry={CARD_RING_RADIUS}
-                style={{
-                  strokeDasharray: `${cardRingPerimeter} ${cardRingPerimeter}`,
-                  strokeDashoffset: ringDashOffset,
-                }}
-              />
-            </svg>
-          )}
-
           <div className="mode-tabs" role="tablist" aria-label="Timer modes">
             <button
               className={`mode-tab ${mode === MODES.FOCUS ? "active" : ""
@@ -485,7 +411,15 @@ function PomodoroApp() {
 
           <div className="timer-visual">
             <div className="timer-circle">
-              <div className="timer-face">
+              <div
+                className="timer-face"
+                style={{
+                  "--timer-ring-progress": `${ringProgressDegrees}deg`,
+                  "--timer-ring-progress-mid": `${ringProgressMidDegrees}deg`,
+                }}
+              >
+                <div className="timer-ring-track" aria-hidden="true"></div>
+                <div className="timer-ring-progress" aria-hidden="true"></div>
                 <div className="timer-time" aria-live="polite">
                   <span>{formatTime(remainingSeconds)}</span>
                 </div>

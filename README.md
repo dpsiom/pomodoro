@@ -1,58 +1,49 @@
 # Pomodoro Focus Timer
 
-Modern, responsive Pomodoro timer optimised for iPad, mobile, and desktop.  
-Built as a static React app (via CDN) with sound alerts, browser notifications, and screen wake support for long study sessions.
+Responsive Pomodoro timer for desktop, tablet, and mobile.
+Built as a static React app loaded from CDNs, with configurable sessions, browser notifications, sound alerts, and optional screen wake support.
+
+![Pomodoro Focus Timer screenshot](docs/app-screenshot.png)
 
 ## Features
 
-- **Pomodoro flow**
-  - Default **25 min focus**, **5 min short break**, **30 min long break**
-  - After **4 focus sessions** you automatically get a long break
-- **Fully configurable**
-  - Change focus, short break, and long break durations
-  - Change how many pomodoros before a long break
-  - Settings are stored in `localStorage` per device
-- **Notifications**
-  - **Audio chime** at the end of every session
-  - **Browser notifications** (where supported and permitted)
-- **Screen wake / iPad support**
-  - Uses the **Screen Wake Lock API** (on supported browsers) to keep the display awake while the timer runs
-  - For iPad, you can also set **Settings → Display & Brightness → Auto-Lock → Never** for best results
-- **Modern UI**
-  - Tomato/pomodoro-themed circular timer
-  - Dark, glassy UI that adapts to mobile, tablet, and desktop
+- Focus, short break, and long break modes
+- Default 25 / 5 / 30 minute session lengths
+- Automatic long break after 4 completed focus sessions
+- Custom session lengths and cycle length saved to `localStorage`
+- Audio chime when a session ends
+- Browser notifications when supported and permitted
+- Screen Wake Lock support on compatible browsers
+- Clean oval timer UI optimized for wide timer text
 
 ## Tech stack
 
-- **React 18** via CDN (UMD build) – no bundler required
-- **JSX** compiled in-browser by **Babel Standalone**
-- Pure CSS for layout and design
-- Static hosting friendly – works on any static file host (AWS Amplify, S3, GitHub Pages, Nginx, etc.)
+- React 18 via CDN
+- ReactDOM 18 via CDN
+- Babel Standalone for in-browser JSX compilation
+- Plain CSS for layout, styling, and timer ring rendering
+- Static hosting friendly deployment model
 
 ## Project structure
 
 ```text
-index.html      # Entry point, loads React/ReactDOM and mounts the app
-app.js          # React app with timer logic, settings, notifications, wake lock
-style.css       # All styling and layout
-favicon.svg     # Tomato timer icon
-Dockerfile      # nginx-based image serving the static site
+index.html         Entry point
+app.js             Timer logic and React UI
+style.css          Main styles
+timer-theme.css    Timer sizing variables
+config.js          Runtime UI toggles
+favicon.svg        App icon
+Dockerfile         Static nginx image
+docs/
+  app-screenshot.png
 .github/
   workflows/
-    docker-publish.yml  # Build & push Docker image to GitHub Container Registry
+    docker-publish.yml
 ```
 
-## Running locally (no Docker)
+## Run locally
 
-Because this is a static site, you can run it locally with any simple HTTP server.
-
-### Option 1 – Quick test by opening the file
-
-You can open `index.html` directly in the browser, but some browsers limit features (like notifications) on `file://` URLs. For best results, use a local HTTP server (Option 2).
-
-### Option 2 – Using a simple HTTP server
-
-From the project root (`pomodoro`):
+Serve the project from the repo root:
 
 ```bash
 python3 -m http.server 8000
@@ -64,83 +55,40 @@ Then open:
 http://localhost:8000
 ```
 
-in your browser.
+Opening `index.html` directly can work, but browser features such as notifications are more reliable over `http://localhost`.
+
+## Configuration
+
+`config.js` exposes a small runtime toggle:
+
+```js
+window.POMODORO_UI = {
+  showTechPanel: false,
+};
+```
+
+Set `showTechPanel: true` to show the optional "Notifications & screen" panel.
 
 ## Using the app
 
-1. **Open the site** (locally or via your hosting URL).
-2. **Adjust session settings** in the “Session settings” panel if you want something other than 25/5/30 and 4 pomodoros.
-3. Click **Start** to begin a focus session.
-4. At the end of each session:
-   - a **short chime** plays, and
-   - a **browser notification** appears (if you enabled notifications and the tab is allowed).
-5. The app automatically switches between **Focus → Short Break → Focus … → Long Break** according to your settings.
-6. Use the **mode tabs** (Focus / Short break / Long break) if you want to manually jump to a specific phase.
+1. Open the app in your browser.
+2. Adjust session settings if you want something other than the defaults.
+3. Click `Start` to begin the timer.
+4. Let the app cycle automatically between focus and break sessions, or switch modes manually with the tabs.
 
-### Notifications
+## Notifications and wake lock
 
-- Click **“Enable notifications”** in the Notifications panel the first time you use the app.
-- Your browser will ask for permission; choose **Allow**.
-- Notifications will then appear at the end of each session, even if the tab is in the background (subject to browser/OS rules).
+- The app can request browser notification permission.
+- On supported browsers, it uses the Screen Wake Lock API while the timer is running.
+- On iPad or iPhone, setting `Auto-Lock` to `Never` may still help during long sessions.
 
-### Sound
+## Docker
 
-- Click **“Test chime”** to confirm audio works on your device.
-- Many mobile browsers require a user interaction before playing sound; starting the timer or testing the chime satisfies this.
-
-### Screen wake / iPad
-
-- The app uses the **Screen Wake Lock API** where available:
-  - When the timer is running, it requests a wake lock to keep the screen from sleeping.
-  - When the timer is paused or finishes, the wake lock is released.
-- On iPad or iPhone, you can additionally set:
-  - `Settings → Display & Brightness → Auto-Lock → Never`
-  to avoid aggressive auto-lock behaviour while studying.
-
-## Deploying to AWS Amplify
-
-AWS Amplify Hosting can deploy this as a **static web app** directly from your GitHub repo.
-
-1. **Push the project to GitHub**
-
-   ```bash
-   cd /path/to/pomodoro
-   git init
-   git add .
-   git commit -m "Initial React pomodoro timer"
-   git branch -M main
-   git remote add origin git@github.com:dpsiom/pomodoro.git   # or https URL
-   git push -u origin main
-   ```
-
-2. **Create an Amplify app**
-   - In the AWS console, go to **Amplify → Hosting → Get started**.
-   - Choose **Host web app**.
-   - Select **GitHub**, authorize if needed, and pick the `dpsiom/pomodoro` repo and `main` branch.
-
-3. **Configure build settings**
-   - Framework: **Static web app** (no special React framework build required).
-   - Build command: **leave empty** (no build step – we serve the files as-is).
-   - Output directory: `/` (root).
-
-4. **Save and deploy**
-   - Amplify will clone the repo, skip a build (no command), and publish `index.html` and the static assets.
-   - It then provides you with a public URL.
-
-5. **Continuous deployment**
-   - Any push to the connected branch (`main`) automatically triggers a new deployment.
-
-## Docker image (local testing)
-
-The included `Dockerfile` builds a small image using Nginx to serve the static site.
-
-### Build & Run the image
-
-From the project root:
+Build and run the included nginx image:
 
 ```bash
-docker build --no-cache -t pomodoro-timer:local .
-docker run --rm -p 8888:80 pomodoro-timer:local
+docker build -t pomodoro-timer:local .
+docker run --rm -p 8080:80 pomodoro-timer:local
 ```
 
 Then open:
@@ -149,65 +97,13 @@ Then open:
 http://localhost:8080
 ```
 
-in your browser.
+## Deploy
 
-### Docker Compose example
+This app is static, so it can be hosted on platforms such as:
 
-You can also run the container via **Docker Compose**.
+- GitHub Pages
+- AWS Amplify Hosting
+- S3 + CloudFront
+- Any nginx-based container or static file host
 
-Create a `compose.yml` like this in the project root:
-
-```yaml
-services:
-  pomodoro:
-    image: pomodoro-timer:local
-    build:
-      context: .
-    ports:
-      - "8080:80"
-    restart: unless-stopped
-```
-
-Then build and start it:
-
-```bash
-docker compose up --build
-```
-
-Open `http://localhost:8080` in your browser to use the app.
-
-## Docker image to GitHub Packages (GitHub Container Registry)
-
-This repo includes a **GitHub Actions workflow** that builds and pushes the image to GitHub Container Registry when changes are pushed to `main`/`master`.
-
-- Workflow: `.github/workflows/docker-publish.yml`
-- Target image: `ghcr.io/<OWNER>/pomodoro:latest`
-
-Once the repo is on GitHub:
-
-1. Ensure the default branch is `main` (or `master`).
-2. Push to that branch; GitHub Actions will:
-   - build the Docker image from the root `Dockerfile`
-   - push it to `ghcr.io/<your-account>/pomodoro:latest`
-
-### Manual push (optional)
-
-You can also build and push manually:
-
-```bash
-# Log in to GitHub Container Registry
-echo "$GITHUB_TOKEN" | docker login ghcr.io -u dpsiom --password-stdin
-
-# Build and tag the image
-docker build -t ghcr.io/dpsiom/pomodoro:latest .
-
-# Push the image
-docker push ghcr.io/dpsiom/pomodoro:latest
-```
-
-Where `GITHUB_TOKEN` is a GitHub personal access token with `write:packages` permission.
-
----
-
-If you want to extend this in future (e.g. stats/history, different profiles, or a true bundler-based React setup), this static version can be ported into a standard React toolchain easily.
-
+The repo also includes a GitHub Actions workflow at `.github/workflows/docker-publish.yml` for publishing a container image to GitHub Container Registry.
