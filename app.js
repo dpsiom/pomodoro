@@ -353,251 +353,258 @@ function PomodoroApp() {
 
   return (
     <div className="app-shell">
-      <header className="app-header">
-        <div className="brand">
-          <div className="brand-icon">
-            <span className="brand-leaf"></span>
-          </div>
-          <div className="brand-text">
-            <h1>Pomodoro Focus</h1>
-            <p>Stay in flow with custom sessions</p>
-          </div>
-        </div>
-      </header>
-
       <main className="app-main">
-        <section
-          className="timer-card"
-          aria-label="Pomodoro timer"
-        >
-          <div className="mode-tabs" role="tablist" aria-label="Timer modes">
-            <button
-              className={`mode-tab ${mode === MODES.FOCUS ? "active" : ""
-                }`}
-              role="tab"
-              aria-selected={mode === MODES.FOCUS}
-              onClick={() => handleModeClick(MODES.FOCUS)}
-            >
-              Focus
-            </button>
-            <button
-              className={`mode-tab ${mode === MODES.SHORT_BREAK ? "active" : ""
-                }`}
-              role="tab"
-              aria-selected={mode === MODES.SHORT_BREAK}
-              onClick={() => handleModeClick(MODES.SHORT_BREAK)}
-            >
-              Short break
-            </button>
-            <button
-              className={`mode-tab ${mode === MODES.LONG_BREAK ? "active" : ""
-                }`}
-              role="tab"
-              aria-selected={mode === MODES.LONG_BREAK}
-              onClick={() => handleModeClick(MODES.LONG_BREAK)}
-            >
-              Long break
-            </button>
-          </div>
+        <section className="app-screen hero-screen" aria-label="Pomodoro timer">
+          <header className="app-header">
+            <div className="brand">
+              <div className="brand-icon">
+                <span className="brand-leaf"></span>
+              </div>
+              <div className="brand-text">
+                <h1>Pomodoro Focus</h1>
+                <p>Stay in flow with custom sessions</p>
+              </div>
+            </div>
+          </header>
 
-          <div className="timer-visual">
-            <div className="timer-circle">
-              <div
-                className="timer-face"
-                style={{
-                  "--timer-ring-progress": `${ringProgressDegrees}deg`,
-                  "--timer-ring-progress-mid": `${ringProgressMidDegrees}deg`,
-                }}
+          <section className="timer-card hero-timer-card">
+            <div className="mode-tabs" role="tablist" aria-label="Timer modes">
+              <button
+                className={`mode-tab ${mode === MODES.FOCUS ? "active" : ""
+                  }`}
+                role="tab"
+                aria-selected={mode === MODES.FOCUS}
+                onClick={() => handleModeClick(MODES.FOCUS)}
               >
-                <div className="timer-ring-track" aria-hidden="true"></div>
-                <div className="timer-ring-progress" aria-hidden="true"></div>
-                <div className="timer-time" aria-live="polite">
-                  <span>{formatTime(remainingSeconds)}</span>
+                Focus
+              </button>
+              <button
+                className={`mode-tab ${mode === MODES.SHORT_BREAK ? "active" : ""
+                  }`}
+                role="tab"
+                aria-selected={mode === MODES.SHORT_BREAK}
+                onClick={() => handleModeClick(MODES.SHORT_BREAK)}
+              >
+                Short break
+              </button>
+              <button
+                className={`mode-tab ${mode === MODES.LONG_BREAK ? "active" : ""
+                  }`}
+                role="tab"
+                aria-selected={mode === MODES.LONG_BREAK}
+                onClick={() => handleModeClick(MODES.LONG_BREAK)}
+              >
+                Long break
+              </button>
+            </div>
+
+            <div className="timer-visual">
+              <div className="timer-circle">
+                <div
+                  className="timer-face"
+                  style={{
+                    "--timer-ring-progress": `${ringProgressDegrees}deg`,
+                    "--timer-ring-progress-mid": `${ringProgressMidDegrees}deg`,
+                  }}
+                >
+                  <div className="timer-ring-track" aria-hidden="true"></div>
+                  <div className="timer-ring-progress" aria-hidden="true"></div>
+                  <div className="timer-time" aria-live="polite">
+                    <span>{formatTime(remainingSeconds)}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="timer-meta">
-            <p id="cycle-label">
-              {settings.sessionsPerCycle > 0
-                ? `Pomodoro ${cycleIndex} / ${settings.sessionsPerCycle}`
-                : `Pomodoro ${cycleIndex}`}
-            </p>
-            <p id="status-label">{statusText}</p>
-          </div>
+            <div className="timer-meta">
+              <p id="cycle-label">
+                {settings.sessionsPerCycle > 0
+                  ? `Pomodoro ${cycleIndex} / ${settings.sessionsPerCycle}`
+                  : `Pomodoro ${cycleIndex}`}
+              </p>
+              <p id="status-label">{statusText}</p>
+            </div>
 
-          <div className="timer-controls">
-            <button
-              id="start-pause-btn"
-              className="primary"
-              onClick={handleStartPause}
-            >
-              {isRunning ? "Pause" : "Start"}
-            </button>
-            <button
-              id="reset-btn"
-              className="ghost"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-          </div>
-        </section>
-
-        <section className="panel settings-panel" aria-label="Timer settings">
-          <div className="panel-header">
-            <h2>Session settings</h2>
-            <p>
-              Adjust lengths to match your study style. Settings are saved on
-              this device.
-            </p>
-          </div>
-          <form
-            id="settings-form"
-            className="settings-grid"
-            onSubmit={handleSettingsSubmit}
-          >
-            <div className="field">
-              <label htmlFor="focus-minutes">Focus length (minutes)</label>
-              <input
-                id="focus-minutes"
-                name="focusMinutes"
-                type="number"
-                min="1"
-                max="180"
-                inputMode="numeric"
-                defaultValue={settings.focusMinutes}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="short-break-minutes">
-                Short break (minutes)
-              </label>
-              <input
-                id="short-break-minutes"
-                name="shortBreakMinutes"
-                type="number"
-                min="1"
-                max="60"
-                inputMode="numeric"
-                defaultValue={settings.shortBreakMinutes}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="long-break-minutes">
-                Long break (minutes)
-              </label>
-              <input
-                id="long-break-minutes"
-                name="longBreakMinutes"
-                type="number"
-                min="1"
-                max="120"
-                inputMode="numeric"
-                defaultValue={settings.longBreakMinutes}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="sessions-per-cycle">
-                Pomodoros before long break
-              </label>
-              <input
-                id="sessions-per-cycle"
-                name="sessionsPerCycle"
-                type="number"
-                min="1"
-                max="12"
-                inputMode="numeric"
-                defaultValue={settings.sessionsPerCycle}
-              />
-            </div>
-            <div className="field field-full">
-              <button type="submit" className="secondary">
-                Save settings
+            <div className="timer-controls">
+              <button
+                id="start-pause-btn"
+                className="primary"
+                onClick={handleStartPause}
+              >
+                {isRunning ? "Pause" : "Start"}
               </button>
               <button
-                type="button"
-                id="reset-settings-btn"
-                className="link-button"
-                onClick={handleResetSettings}
+                id="reset-btn"
+                className="ghost"
+                onClick={handleReset}
               >
-                Reset to defaults
+                Reset
               </button>
             </div>
-          </form>
+          </section>
+
+          <div className="scroll-prompt" aria-hidden="true">
+            <span>Scroll for session settings</span>
+          </div>
         </section>
 
-        {SHOW_TECH_PANEL && (
-          <section
-            className="panel tech-panel"
-            aria-label="Notifications and screen wake"
-          >
-            <div className="panel-header">
-              <h2>Notifications &amp; screen</h2>
-              <p>
-                Sound and browser notifications fire when a session finishes.
-                Screen wake works on supported browsers (including newer iPads).
-              </p>
-            </div>
-            <div className="tech-grid">
-              <div className="tech-item">
-                <h3>Sound</h3>
-                <p>We&apos;ll play a short chime at the end of each session.</p>
-                <button
-                  id="test-sound-btn"
-                  className="ghost small"
-                  onClick={handleTestSound}
-                >
-                  Test chime
-                </button>
-              </div>
-
-              <div className="tech-item">
-                <h3>Browser notifications</h3>
-                <p id="notification-status">
-                  {updateNotificationStatusText()}
-                </p>
-                <button
-                  id="enable-notifications-btn"
-                  className="ghost small"
-                  onClick={handleEnableNotifications}
-                  disabled={
-                    typeof Notification === "undefined" ||
-                    notificationPermission === "granted"
-                  }
-                >
-                  {notificationPermission === "granted"
-                    ? "Enabled"
-                    : "Enable notifications"}
-                </button>
-              </div>
-
-              <div className="tech-item">
-                <h3>Keep screen awake</h3>
-                <p id="wake-lock-status">{wakeLockStatus}</p>
-                <p className="tech-note">
-                  When the timer runs, we try to keep your screen on. If your
-                  iPad still locks, set Auto-Lock to Never in iOS settings.
+        <section className="app-screen settings-screen">
+          <div className="settings-stack">
+            <section className="panel settings-panel" aria-label="Timer settings">
+              <div className="panel-header">
+                <h2>Session settings</h2>
+                <p>
+                  Adjust lengths to match your study style. Settings are saved on
+                  this device.
                 </p>
               </div>
-            </div>
-          </section>
-        )}
+              <form
+                id="settings-form"
+                className="settings-grid"
+                onSubmit={handleSettingsSubmit}
+              >
+                <div className="field">
+                  <label htmlFor="focus-minutes">Focus length (minutes)</label>
+                  <input
+                    id="focus-minutes"
+                    name="focusMinutes"
+                    type="number"
+                    min="1"
+                    max="180"
+                    inputMode="numeric"
+                    defaultValue={settings.focusMinutes}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="short-break-minutes">
+                    Short break (minutes)
+                  </label>
+                  <input
+                    id="short-break-minutes"
+                    name="shortBreakMinutes"
+                    type="number"
+                    min="1"
+                    max="60"
+                    inputMode="numeric"
+                    defaultValue={settings.shortBreakMinutes}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="long-break-minutes">
+                    Long break (minutes)
+                  </label>
+                  <input
+                    id="long-break-minutes"
+                    name="longBreakMinutes"
+                    type="number"
+                    min="1"
+                    max="120"
+                    inputMode="numeric"
+                    defaultValue={settings.longBreakMinutes}
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="sessions-per-cycle">
+                    Pomodoros before long break
+                  </label>
+                  <input
+                    id="sessions-per-cycle"
+                    name="sessionsPerCycle"
+                    type="number"
+                    min="1"
+                    max="12"
+                    inputMode="numeric"
+                    defaultValue={settings.sessionsPerCycle}
+                  />
+                </div>
+                <div className="field field-full">
+                  <button type="submit" className="secondary">
+                    Save settings
+                  </button>
+                  <button
+                    type="button"
+                    id="reset-settings-btn"
+                    className="link-button"
+                    onClick={handleResetSettings}
+                  >
+                    Reset to defaults
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            {SHOW_TECH_PANEL && (
+              <section
+                className="panel tech-panel"
+                aria-label="Notifications and screen wake"
+              >
+                <div className="panel-header">
+                  <h2>Notifications &amp; screen</h2>
+                  <p>
+                    Sound and browser notifications fire when a session finishes.
+                    Screen wake works on supported browsers (including newer iPads).
+                  </p>
+                </div>
+                <div className="tech-grid">
+                  <div className="tech-item">
+                    <h3>Sound</h3>
+                    <p>We&apos;ll play a short chime at the end of each session.</p>
+                    <button
+                      id="test-sound-btn"
+                      className="ghost small"
+                      onClick={handleTestSound}
+                    >
+                      Test chime
+                    </button>
+                  </div>
+
+                  <div className="tech-item">
+                    <h3>Browser notifications</h3>
+                    <p id="notification-status">
+                      {updateNotificationStatusText()}
+                    </p>
+                    <button
+                      id="enable-notifications-btn"
+                      className="ghost small"
+                      onClick={handleEnableNotifications}
+                      disabled={
+                        typeof Notification === "undefined" ||
+                        notificationPermission === "granted"
+                      }
+                    >
+                      {notificationPermission === "granted"
+                        ? "Enabled"
+                        : "Enable notifications"}
+                    </button>
+                  </div>
+
+                  <div className="tech-item">
+                    <h3>Keep screen awake</h3>
+                    <p id="wake-lock-status">{wakeLockStatus}</p>
+                    <p className="tech-note">
+                      When the timer runs, we try to keep your screen on. If your
+                      iPad still locks, set Auto-Lock to Never in iOS settings.
+                    </p>
+                  </div>
+                </div>
+              </section>
+            )}
+          </div>
+
+          <footer className="app-footer">
+            <p>
+              Pomodoro timer by{" "}
+              <a
+                href="https://github.com/dpsiom"
+                target="_blank"
+                rel="noreferrer"
+              >
+                dpsiom
+              </a>
+            </p>
+          </footer>
+        </section>
       </main>
-
-      <footer className="app-footer">
-        <p>
-          Pomodoro timer by{" "}
-          <a
-            href="https://github.com/dpsiom"
-            target="_blank"
-            rel="noreferrer"
-          >
-            dpsiom
-          </a>
-        </p>
-      </footer>
     </div>
   );
 }
