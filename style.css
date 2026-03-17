@@ -157,7 +157,7 @@ body {
   min-height: 0;
   justify-content: center;
   align-self: stretch;
-  width: min(100%, 1180px);
+  width: min(100%, 1040px);
   margin: 0 auto;
   overflow-x: clip;
 }
@@ -616,7 +616,7 @@ button:disabled {
 
 @media (min-width: 1280px) {
   .hero-timer-card {
-    width: min(100%, 1480px);
+    width: min(100%, 1160px);
   }
 
   .timer-circle {
@@ -631,7 +631,7 @@ button:disabled {
 
 @media (min-width: 1600px) {
   .hero-timer-card {
-    width: min(100%, 1680px);
+    width: min(100%, 1260px);
   }
 
   .timer-circle {
