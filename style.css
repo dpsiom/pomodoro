@@ -609,8 +609,23 @@ button:disabled {
   }
 
   .timer-circle {
-    width: min(calc(var(--timer-oval-width) + 60px), calc(100vw - 120px));
-    height: min(calc(var(--timer-oval-height) + 32px), 44vh, 34vw);
+    width: min(calc(var(--timer-oval-width) + 90px), calc(100vw - 120px));
+    height: min(calc(var(--timer-oval-height) + 48px), 46vh, 36vw);
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-timer-card {
+    width: min(100%, 1200px);
+  }
+
+  .timer-circle {
+    width: min(calc(var(--timer-oval-width) + 180px), 760px);
+    height: min(calc(var(--timer-oval-height) + 92px), 420px);
+  }
+
+  .timer-time {
+    font-size: clamp(4.8rem, 6vw, 7rem);
   }
 }
 
