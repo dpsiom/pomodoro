@@ -1,5 +1,8 @@
 const { useState, useEffect, useRef } = React;
 
+const SHOW_TECH_PANEL =
+  (window.POMODORO_UI && window.POMODORO_UI.showTechPanel) || false;
+
 const DEFAULTS = {
   focusMinutes: 25,
   shortBreakMinutes: 5,
@@ -15,7 +18,8 @@ const MODES = {
   LONG_BREAK: "long_break",
 };
 
-const ringCircumference = 2 * Math.PI * 54;
+const CARD_RING_STROKE_WIDTH = 6;
+const CARD_RING_RADIUS = 32;
 
 function loadSettings() {
   try {
@@ -59,21 +63,23 @@ function playChime() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.25);
+    const osc = ctx.createOscillator();
+    osc.type = "triangle";
+    // Softer, lower two-note chime
+    osc.frequency.setValueAtTime(660, ctx.currentTime);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.18);
 
-    gain.gain.setValueAtTime(0.0025, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.3);
+    // Increased overall volume while still avoiding clipping
+    gain.gain.setValueAtTime(0.03, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0003, ctx.currentTime + 0.45);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
     osc.start();
-    osc.stop(ctx.currentTime + 0.32);
+    osc.stop(ctx.currentTime + 0.5);
   } catch (e) {
     console.warn("Unable to play chime", e);
   }
@@ -114,9 +120,11 @@ function PomodoroApp() {
   const [wakeLockStatus, setWakeLockStatus] = useState(
     "Status: waiting for timer"
   );
+  const [timerCardBox, setTimerCardBox] = useState({ width: 0, height: 0 });
 
   const intervalRef = useRef(null);
   const wakeLockRef = useRef(null);
+  const timerCardRef = useRef(null);
 
   const cycleIndex =
     (completedFocusSessions % settings.sessionsPerCycle) + 1;
@@ -131,17 +139,26 @@ function PomodoroApp() {
     return isRunning ? "Long break running" : "Long break";
   })();
 
-  const ringOffset = (() => {
+  const ringProgress = (() => {
     if (!totalSeconds) return 0;
-    const progress = 1 - remainingSeconds / totalSeconds;
-    const clamped = Math.min(Math.max(progress, 0), 1);
-    return ringCircumference * clamped;
+    const progress = remainingSeconds / totalSeconds;
+    return Math.min(Math.max(progress, 0), 1);
   })();
+  const cardRingInset = CARD_RING_STROKE_WIDTH / 2;
+  const cardRingWidth = Math.max(timerCardBox.width - CARD_RING_STROKE_WIDTH, 0);
+  const cardRingHeight = Math.max(timerCardBox.height - CARD_RING_STROKE_WIDTH, 0);
+  const cardRingPerimeter =
+    timerCardBox.width > 0 && timerCardBox.height > 0
+      ? 2 * Math.max(cardRingWidth - CARD_RING_RADIUS * 2, 0) +
+        2 * Math.max(cardRingHeight - CARD_RING_RADIUS * 2, 0) +
+        2 * Math.PI * CARD_RING_RADIUS
+      : 0;
+  const ringDashOffset = cardRingPerimeter * (1 - ringProgress);
 
   async function requestWakeLock() {
     if (!("wakeLock" in navigator)) {
       setWakeLockStatus(
-      "Status: not supported; use iOS Auto-Lock settings"
+        "Status: not supported; use iOS Auto-Lock settings"
       );
       return;
     }
@@ -183,6 +200,39 @@ function PomodoroApp() {
       }
     }
   }
+
+  useEffect(() => {
+    const node = timerCardRef.current;
+    if (!node || typeof ResizeObserver === "undefined") return;
+
+    const updateBox = () => {
+      setTimerCardBox({
+        width: node.clientWidth,
+        height: node.clientHeight,
+      });
+    };
+
+    updateBox();
+
+    const observer = new ResizeObserver(() => {
+      updateBox();
+    });
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission !== "default") return;
+    Notification.requestPermission()
+      .then((permission) => {
+        setNotificationPermission(permission);
+      })
+      .catch((e) => {
+        console.warn("Notification permission request failed", e);
+      });
+  }, []);
 
   useEffect(() => {
     function handleVisibility() {
@@ -359,12 +409,54 @@ function PomodoroApp() {
       </header>
 
       <main className="app-main">
-        <section className="timer-card" aria-label="Pomodoro timer">
+        <section
+          className="timer-card"
+          aria-label="Pomodoro timer"
+          ref={timerCardRef}
+        >
+          {timerCardBox.width > 0 && timerCardBox.height > 0 && (
+            <svg
+              className="timer-square"
+              viewBox={`0 0 ${timerCardBox.width} ${timerCardBox.height}`}
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              <defs>
+                <linearGradient id="timerSquareGradient" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0%" stopColor="#fee2e2" />
+                  <stop offset="45%" stopColor="#fb4d3d" />
+                  <stop offset="100%" stopColor="#1d4ed8" />
+                </linearGradient>
+              </defs>
+              <rect
+                className="timer-square-bg"
+                x={cardRingInset}
+                y={cardRingInset}
+                width={cardRingWidth}
+                height={cardRingHeight}
+                rx={CARD_RING_RADIUS}
+                ry={CARD_RING_RADIUS}
+              />
+              <rect
+                className="timer-square-progress"
+                x={cardRingInset}
+                y={cardRingInset}
+                width={cardRingWidth}
+                height={cardRingHeight}
+                rx={CARD_RING_RADIUS}
+                ry={CARD_RING_RADIUS}
+                style={{
+                  strokeDasharray: `${cardRingPerimeter} ${cardRingPerimeter}`,
+                  strokeDashoffset: ringDashOffset,
+                }}
+              />
+            </svg>
+          )}
+
           <div className="mode-tabs" role="tablist" aria-label="Timer modes">
             <button
-              className={`mode-tab ${
-                mode === MODES.FOCUS ? "active" : ""
-              }`}
+              className={`mode-tab ${mode === MODES.FOCUS ? "active" : ""
+                }`}
               role="tab"
               aria-selected={mode === MODES.FOCUS}
               onClick={() => handleModeClick(MODES.FOCUS)}
@@ -372,9 +464,8 @@ function PomodoroApp() {
               Focus
             </button>
             <button
-              className={`mode-tab ${
-                mode === MODES.SHORT_BREAK ? "active" : ""
-              }`}
+              className={`mode-tab ${mode === MODES.SHORT_BREAK ? "active" : ""
+                }`}
               role="tab"
               aria-selected={mode === MODES.SHORT_BREAK}
               onClick={() => handleModeClick(MODES.SHORT_BREAK)}
@@ -382,9 +473,8 @@ function PomodoroApp() {
               Short break
             </button>
             <button
-              className={`mode-tab ${
-                mode === MODES.LONG_BREAK ? "active" : ""
-              }`}
+              className={`mode-tab ${mode === MODES.LONG_BREAK ? "active" : ""
+                }`}
               role="tab"
               aria-selected={mode === MODES.LONG_BREAK}
               onClick={() => handleModeClick(MODES.LONG_BREAK)}
@@ -395,37 +485,10 @@ function PomodoroApp() {
 
           <div className="timer-visual">
             <div className="timer-circle">
-              <svg
-                className="timer-ring"
-                viewBox="0 0 120 120"
-                aria-hidden="true"
-              >
-                <defs>
-                  <linearGradient id="timerGradient" x1="0" x2="1" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#fee2e2" />
-                    <stop offset="45%" stopColor="#fb4d3d" />
-                    <stop offset="100%" stopColor="#1d4ed8" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  className="timer-ring-bg"
-                  cx="60"
-                  cy="60"
-                  r="54"
-                />
-                <circle
-                  className="timer-ring-progress"
-                  cx="60"
-                  cy="60"
-                  r="54"
-                  style={{
-                    strokeDasharray: ringCircumference,
-                    strokeDashoffset: ringOffset,
-                  }}
-                />
-              </svg>
-              <div className="timer-time" aria-live="polite">
-                <span>{formatTime(remainingSeconds)}</span>
+              <div className="timer-face">
+                <div className="timer-time" aria-live="polite">
+                  <span>{formatTime(remainingSeconds)}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -540,60 +603,62 @@ function PomodoroApp() {
           </form>
         </section>
 
-        <section
-          className="panel tech-panel"
-          aria-label="Notifications and screen wake"
-        >
-          <div className="panel-header">
-            <h2>Notifications & screen</h2>
-            <p>
-              Sound and browser notifications fire when a session finishes.
-              Screen wake works on supported browsers (including newer iPads).
-            </p>
-          </div>
-          <div className="tech-grid">
-            <div className="tech-item">
-              <h3>Sound</h3>
-              <p>We&apos;ll play a short chime at the end of each session.</p>
-              <button
-                id="test-sound-btn"
-                className="ghost small"
-                onClick={handleTestSound}
-              >
-                Test chime
-              </button>
-            </div>
-
-            <div className="tech-item">
-              <h3>Browser notifications</h3>
-              <p id="notification-status">
-                {updateNotificationStatusText()}
-              </p>
-              <button
-                id="enable-notifications-btn"
-                className="ghost small"
-                onClick={handleEnableNotifications}
-                disabled={
-                  typeof Notification === "undefined" ||
-                  notificationPermission === "granted"
-                }
-              >
-                {notificationPermission === "granted"
-                  ? "Enabled"
-                  : "Enable notifications"}
-              </button>
-            </div>
-
-            <div className="tech-item">
-              <h3>Keep screen awake</h3>
-              <p id="wake-lock-status">{wakeLockStatus}</p>
-              <p className="tech-note">
-                When the timer runs, we try to keep your screen on. If your
-                iPad still locks, set Auto-Lock to Never in iOS settings.
+        {SHOW_TECH_PANEL && (
+          <section
+            className="panel tech-panel"
+            aria-label="Notifications and screen wake"
+          >
+            <div className="panel-header">
+              <h2>Notifications &amp; screen</h2>
+              <p>
+                Sound and browser notifications fire when a session finishes.
+                Screen wake works on supported browsers (including newer iPads).
               </p>
             </div>
-          </div>
-        </section>
+            <div className="tech-grid">
+              <div className="tech-item">
+                <h3>Sound</h3>
+                <p>We&apos;ll play a short chime at the end of each session.</p>
+                <button
+                  id="test-sound-btn"
+                  className="ghost small"
+                  onClick={handleTestSound}
+                >
+                  Test chime
+                </button>
+              </div>
+
+              <div className="tech-item">
+                <h3>Browser notifications</h3>
+                <p id="notification-status">
+                  {updateNotificationStatusText()}
+                </p>
+                <button
+                  id="enable-notifications-btn"
+                  className="ghost small"
+                  onClick={handleEnableNotifications}
+                  disabled={
+                    typeof Notification === "undefined" ||
+                    notificationPermission === "granted"
+                  }
+                >
+                  {notificationPermission === "granted"
+                    ? "Enabled"
+                    : "Enable notifications"}
+                </button>
+              </div>
+
+              <div className="tech-item">
+                <h3>Keep screen awake</h3>
+                <p id="wake-lock-status">{wakeLockStatus}</p>
+                <p className="tech-note">
+                  When the timer runs, we try to keep your screen on. If your
+                  iPad still locks, set Auto-Lock to Never in iOS settings.
+                </p>
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       <footer className="app-footer">
@@ -615,4 +680,3 @@ function PomodoroApp() {
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement);
 root.render(<PomodoroApp />);
-

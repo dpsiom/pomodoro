@@ -1,0 +1,8 @@
+:root {
+  /* Timer oval sizing */
+  --timer-oval-width: 380px;
+  --timer-oval-height: 260px;
+
+  /* Timer text sizing */
+  --timer-font-size: clamp(3.4rem, 12vw, 5.2rem);
+}

@@ -134,18 +134,13 @@ AWS Amplify Hosting can deploy this as a **static web app** directly from your G
 
 The included `Dockerfile` builds a small image using Nginx to serve the static site.
 
-### Build the image
+### Build & Run the image
 
 From the project root:
 
 ```bash
-docker build -t pomodoro-timer:local .
-```
-
-### Run the container
-
-```bash
-docker run --rm -p 8080:80 pomodoro-timer:local
+docker build --no-cache -t pomodoro-timer:local .
+docker run --rm -p 8888:80 pomodoro-timer:local
 ```
 
 Then open:
@@ -155,6 +150,31 @@ http://localhost:8080
 ```
 
 in your browser.
+
+### Docker Compose example
+
+You can also run the container via **Docker Compose**.
+
+Create a `compose.yml` like this in the project root:
+
+```yaml
+services:
+  pomodoro:
+    image: pomodoro-timer:local
+    build:
+      context: .
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+```
+
+Then build and start it:
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:8080` in your browser to use the app.
 
 ## Docker image to GitHub Packages (GitHub Container Registry)
 
