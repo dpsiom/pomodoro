@@ -60,7 +60,7 @@ body {
 .hero-screen {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 18px;
+  gap: 14px;
 }
 
 .settings-screen {
@@ -157,11 +157,17 @@ body {
   min-height: 0;
   justify-content: center;
   align-self: stretch;
+  width: min(100%, 1024px);
+  margin: 0 auto;
+  overflow-x: clip;
 }
 
 .mode-tabs {
   display: inline-flex;
   align-self: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 100%;
   padding: 4px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.85);
@@ -205,8 +211,9 @@ body {
 
 .timer-circle {
   --timer-inner-inset: 12px;
-  width: min(var(--timer-oval-width), 90vw);
-  height: min(var(--timer-oval-height), 72vw);
+  width: min(var(--timer-oval-width), calc(100vw - 76px));
+  max-width: 100%;
+  height: min(var(--timer-oval-height), 38vh, 58vw);
   border-radius: 50%;
   background:
     radial-gradient(circle at 20% 0%, rgba(254, 249, 195, 0.42), transparent 55%),
@@ -325,7 +332,7 @@ body {
 .scroll-prompt {
   display: flex;
   justify-content: center;
-  padding-bottom: 6px;
+  padding-bottom: 2px;
 }
 
 .scroll-prompt span {
@@ -577,16 +584,11 @@ button:disabled {
   }
 
   .hero-screen {
-    gap: 24px;
+    gap: 18px;
   }
 
   .timer-card {
     padding: 22px 24px 24px;
-  }
-
-  .hero-timer-card {
-    width: min(100%, 1024px);
-    margin: 0 auto;
   }
 
   .panel {
@@ -607,16 +609,29 @@ button:disabled {
   }
 
   .timer-circle {
-    width: min(calc(var(--timer-oval-width) + 100px), 70vw);
-    height: min(calc(var(--timer-oval-height) + 100px), 52vw);
+    width: min(calc(var(--timer-oval-width) + 60px), calc(100vw - 120px));
+    height: min(calc(var(--timer-oval-height) + 32px), 44vh, 34vw);
   }
 }
 
 /* Very small phones */
 @media (max-width: 360px) {
+  .app-screen {
+    padding: 12px;
+  }
+
+  .hero-screen {
+    gap: 10px;
+  }
+
+  .timer-card {
+    padding: 14px 12px 16px;
+    gap: 14px;
+  }
+
   .timer-circle {
-    width: 240px;
-    height: 240px;
+    width: min(100%, calc(100vw - 48px));
+    height: min(220px, 32vh, 54vw);
   }
 
   .mode-tab {
@@ -627,5 +642,45 @@ button:disabled {
   .scroll-prompt span {
     font-size: 0.72rem;
     padding-inline: 12px;
+  }
+}
+
+@media (max-width: 430px) {
+  .app-screen {
+    padding-inline: 12px;
+  }
+
+  .timer-card {
+    padding-inline: 12px;
+  }
+
+  .timer-circle {
+    width: min(var(--timer-oval-width), calc(100vw - 48px));
+    height: min(240px, 34vh, 56vw);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 900px) {
+  .hero-screen {
+    gap: 10px;
+  }
+
+  .app-header {
+    padding-top: 0;
+  }
+
+  .hero-timer-card {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    gap: 12px;
+  }
+
+  .timer-circle {
+    height: min(34vh, 30vw);
+  }
+
+  .scroll-prompt span {
+    padding: 8px 14px;
+    font-size: 0.72rem;
   }
 }
