@@ -157,7 +157,7 @@ body {
   min-height: 0;
   justify-content: center;
   align-self: stretch;
-  width: min(100%, 1024px);
+  width: min(100%, 1180px);
   margin: 0 auto;
   overflow-x: clip;
 }
@@ -609,23 +609,38 @@ button:disabled {
   }
 
   .timer-circle {
-    width: min(calc(var(--timer-oval-width) + 90px), calc(100vw - 120px));
-    height: min(calc(var(--timer-oval-height) + 48px), 46vh, 36vw);
+    width: min(calc(var(--timer-oval-width) + 130px), calc(100vw - 120px));
+    height: min(calc(var(--timer-oval-height) + 72px), 48vh, 40vw);
   }
 }
 
 @media (min-width: 1280px) {
   .hero-timer-card {
-    width: min(100%, 1200px);
+    width: min(100%, 1480px);
   }
 
   .timer-circle {
-    width: min(calc(var(--timer-oval-width) + 180px), 760px);
-    height: min(calc(var(--timer-oval-height) + 92px), 420px);
+    width: min(calc(var(--timer-oval-width) + 320px), 980px);
+    height: min(calc(var(--timer-oval-height) + 180px), 560px);
   }
 
   .timer-time {
-    font-size: clamp(4.8rem, 6vw, 7rem);
+    font-size: clamp(5.6rem, 6.8vw, 8.6rem);
+  }
+}
+
+@media (min-width: 1600px) {
+  .hero-timer-card {
+    width: min(100%, 1680px);
+  }
+
+  .timer-circle {
+    width: min(calc(var(--timer-oval-width) + 420px), 1120px);
+    height: min(calc(var(--timer-oval-height) + 240px), 640px);
+  }
+
+  .timer-time {
+    font-size: clamp(6.4rem, 6vw, 10rem);
   }
 }
 
