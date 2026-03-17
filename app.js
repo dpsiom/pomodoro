@@ -189,18 +189,6 @@ function PomodoroApp() {
   }
 
   useEffect(() => {
-    if (typeof Notification === "undefined") return;
-    if (Notification.permission !== "default") return;
-    Notification.requestPermission()
-      .then((permission) => {
-        setNotificationPermission(permission);
-      })
-      .catch((e) => {
-        console.warn("Notification permission request failed", e);
-      });
-  }, []);
-
-  useEffect(() => {
     function handleVisibility() {
       if (document.visibilityState === "visible") {
         ensureWakeLock();
@@ -210,7 +198,7 @@ function PomodoroApp() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  });
+  }, [isRunning]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -242,8 +230,8 @@ function PomodoroApp() {
     };
   }, [isRunning]);
 
-  function resetForMode(nextMode) {
-    const secs = secondsForMode(settings, nextMode);
+  function resetForMode(nextMode, nextSettings = settings) {
+    const secs = secondsForMode(nextSettings, nextMode);
     setMode(nextMode);
     setTotalSeconds(secs);
     setRemainingSeconds(secs);
@@ -329,19 +317,22 @@ function PomodoroApp() {
     };
     setSettings(nextSettings);
     saveSettings(nextSettings);
-    resetForMode(mode);
+    resetForMode(mode, nextSettings);
   }
 
   function handleResetSettings() {
     const base = { ...DEFAULTS };
     setSettings(base);
     saveSettings(base);
-    resetForMode(mode);
+    resetForMode(mode, base);
   }
 
   function updateNotificationStatusText() {
     if (!("Notification" in window)) {
       return "Permission: not supported in this browser";
+    }
+    if (notificationPermission === "default") {
+      return "Permission: not requested";
     }
     return `Permission: ${notificationPermission}`;
   }

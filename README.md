@@ -63,11 +63,11 @@ Opening `index.html` directly can work, but browser features such as notificatio
 
 ```js
 window.POMODORO_UI = {
-  showTechPanel: false,
+  showTechPanel: true,
 };
 ```
 
-Set `showTechPanel: true` to show the optional "Notifications & screen" panel.
+Set `showTechPanel: false` to hide the "Notifications & screen" panel.
 
 ## Using the app
 
@@ -78,7 +78,7 @@ Set `showTechPanel: true` to show the optional "Notifications & screen" panel.
 
 ## Notifications and wake lock
 
-- The app can request browser notification permission.
+- The app requests browser notification permission only when you click the enable button in the optional tech panel.
 - On supported browsers, it uses the Screen Wake Lock API while the timer is running.
 - On iPad or iPhone, setting `Auto-Lock` to `Never` may still help during long sessions.
 
@@ -96,6 +96,8 @@ Then open:
 ```text
 http://localhost:8080
 ```
+
+The container image copies only the runtime files needed to serve the app.
 
 ## Deploy
 
