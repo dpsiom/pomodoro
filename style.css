@@ -213,7 +213,7 @@ body {
   --timer-inner-inset: 12px;
   width: min(var(--timer-oval-width), calc(100vw - 76px));
   max-width: 100%;
-  height: min(var(--timer-oval-height), 38vh, 58vw);
+  height: min(var(--timer-oval-height), 42vh, 58vw);
   border-radius: 50%;
   background:
     radial-gradient(circle at 20% 0%, rgba(254, 249, 195, 0.42), transparent 55%),
@@ -610,7 +610,7 @@ button:disabled {
 
   .timer-circle {
     width: min(calc(var(--timer-oval-width) + 130px), calc(100vw - 120px));
-    height: min(calc(var(--timer-oval-height) + 72px), 48vh, 40vw);
+    height: min(calc(var(--timer-oval-height) + 110px), 56vh, 40vw);
   }
 }
 
@@ -621,7 +621,7 @@ button:disabled {
 
   .timer-circle {
     width: min(calc(var(--timer-oval-width) + 320px), 980px);
-    height: min(calc(var(--timer-oval-height) + 180px), 560px);
+    height: min(calc(var(--timer-oval-height) + 220px), 600px);
   }
 
   .timer-time {
@@ -636,7 +636,7 @@ button:disabled {
 
   .timer-circle {
     width: min(calc(var(--timer-oval-width) + 420px), 1120px);
-    height: min(calc(var(--timer-oval-height) + 240px), 640px);
+    height: min(calc(var(--timer-oval-height) + 280px), 700px);
   }
 
   .timer-time {
