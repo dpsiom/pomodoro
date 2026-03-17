@@ -120,6 +120,7 @@ function PomodoroApp() {
 
   const intervalRef = useRef(null);
   const wakeLockRef = useRef(null);
+  const endTimeRef = useRef(null);
 
   const cycleIndex =
     (completedFocusSessions % settings.sessionsPerCycle) + 1;
@@ -188,9 +189,28 @@ function PomodoroApp() {
     }
   }
 
+  function syncRemainingTime() {
+    if (!endTimeRef.current) return;
+
+    const nextRemainingSeconds = Math.max(
+      0,
+      Math.ceil((endTimeRef.current - Date.now()) / 1000)
+    );
+
+    if (nextRemainingSeconds <= 0) {
+      endTimeRef.current = null;
+      setRemainingSeconds(0);
+      handleSessionComplete();
+      return;
+    }
+
+    setRemainingSeconds(nextRemainingSeconds);
+  }
+
   useEffect(() => {
     function handleVisibility() {
       if (document.visibilityState === "visible") {
+        syncRemainingTime();
         ensureWakeLock();
       }
     }
@@ -198,7 +218,7 @@ function PomodoroApp() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [isRunning]);
+  }, [isRunning, mode, settings]);
 
   useEffect(() => {
     if (!isRunning) {
@@ -210,16 +230,15 @@ function PomodoroApp() {
       return;
     }
 
+    if (!endTimeRef.current) {
+      endTimeRef.current = Date.now() + remainingSeconds * 1000;
+    }
+
     intervalRef.current = setInterval(() => {
-      setRemainingSeconds((prev) => {
-        if (prev <= 1) {
-          handleSessionComplete();
-          return 0;
-        }
-        return prev - 1;
-      });
+      syncRemainingTime();
     }, 1000);
 
+    syncRemainingTime();
     ensureWakeLock();
 
     return () => {
@@ -228,13 +247,15 @@ function PomodoroApp() {
         intervalRef.current = null;
       }
     };
-  }, [isRunning]);
+  }, [isRunning, mode, settings]);
 
-  function resetForMode(nextMode, nextSettings = settings) {
+  function resetForMode(nextMode, nextSettings = settings, options = {}) {
+    const { restartRunning = false } = options;
     const secs = secondsForMode(nextSettings, nextMode);
     setMode(nextMode);
     setTotalSeconds(secs);
     setRemainingSeconds(secs);
+    endTimeRef.current = restartRunning ? Date.now() + secs * 1000 : null;
   }
 
   function handleSessionComplete() {
@@ -267,7 +288,15 @@ function PomodoroApp() {
   }
 
   function handleStartPause() {
-    setIsRunning((prev) => !prev);
+    if (isRunning) {
+      syncRemainingTime();
+      endTimeRef.current = null;
+      setIsRunning(false);
+      return;
+    }
+
+    endTimeRef.current = Date.now() + remainingSeconds * 1000;
+    setIsRunning(true);
   }
 
   function handleReset() {
@@ -317,14 +346,14 @@ function PomodoroApp() {
     };
     setSettings(nextSettings);
     saveSettings(nextSettings);
-    resetForMode(mode, nextSettings);
+    resetForMode(mode, nextSettings, { restartRunning: isRunning });
   }
 
   function handleResetSettings() {
     const base = { ...DEFAULTS };
     setSettings(base);
     saveSettings(base);
-    resetForMode(mode, base);
+    resetForMode(mode, base, { restartRunning: isRunning });
   }
 
   function updateNotificationStatusText() {
