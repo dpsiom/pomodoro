@@ -31,7 +31,7 @@ body {
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Poppins", sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   background:
     radial-gradient(circle at top left, rgba(248, 113, 113, 0.24), transparent 60%),
@@ -130,7 +130,7 @@ body {
 
 .brand-text h1 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: clamp(0.92rem, 3vw, 1.1rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: 600;
@@ -556,25 +556,51 @@ input[type="number"]:focus {
 }
 
 .app-footer {
+  position: relative;
   padding: 0 4px 8px;
+  min-height: 58px;
   text-align: center;
   font-size: 0.78rem;
   color: var(--text-soft);
 }
 
+.app-footer p {
+  margin: 0;
+  padding: 16px 64px 8px;
+}
+
+.app-version {
+  position: absolute;
+  right: max(4px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  color: var(--text-soft);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
 .app-footer a {
   color: var(--accent-soft);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .app-footer a:hover {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 button:disabled {
   opacity: 0.5;
   cursor: default;
   box-shadow: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
 }
 
 /* Larger screens */

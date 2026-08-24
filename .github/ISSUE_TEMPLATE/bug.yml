@@ -1,0 +1,41 @@
+name: Bug report
+description: Report broken or unexpected behavior.
+title: "Bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Please include enough evidence for an agent or maintainer to reproduce the problem.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Include URL, browser, viewport, steps, logs, and screenshots when relevant.
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority
+      options:
+        - P0 - production or crawl blocker
+        - P1 - high priority
+        - P2 - normal priority
+        - P3 - low priority
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "- [ ] Observable outcome"
+    validations:
+      required: true

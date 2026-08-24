@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Live Pomodoro timer
+    url: https://pomodoro.iomdev.com/
+    about: Check the current production behavior before opening an issue.

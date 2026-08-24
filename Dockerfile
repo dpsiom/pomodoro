@@ -1,11 +1,14 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+COPY . .
+RUN npm run build
+
 FROM nginx:alpine
 
-# Copy only the static runtime assets into Nginx's default web root
-COPY index.html /usr/share/nginx/html/
-COPY app.js /usr/share/nginx/html/
-COPY config.js /usr/share/nginx/html/
-COPY style.css /usr/share/nginx/html/
-COPY timer-theme.css /usr/share/nginx/html/
-COPY favicon.svg /usr/share/nginx/html/
+COPY --from=build /app/dist/ /usr/share/nginx/html/
 
-# Use default CMD from nginx:alpine (starts nginx in foreground)
+EXPOSE 80

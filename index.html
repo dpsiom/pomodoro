@@ -2,51 +2,63 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Pomodoro Focus Timer</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#171923" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>Pomodoro Focus Timer | Customisable Study Timer</title>
     <meta
       name="description"
-      content="Customisable pomodoro study timer with notifications and screen wake for iPad, mobile and desktop."
+      content="Free, customisable Pomodoro focus timer with adjustable work and break sessions, saved settings, notifications and screen wake support on any device."
     />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://pomodoro.iomdev.com/" />
 
-    <!-- iOS / iPad full-screen hints -->
+    <meta name="theme-color" content="#171923" />
+    <meta name="color-scheme" content="dark" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:site_name" content="Pomodoro Focus Timer" />
+    <meta property="og:title" content="Pomodoro Focus Timer | Customisable Study Timer" />
+    <meta
+      property="og:description"
+      content="Set custom focus and break sessions with a free Pomodoro timer that works across mobile, tablet and desktop."
+    />
+    <meta property="og:url" content="https://pomodoro.iomdev.com/" />
+    <meta property="og:image" content="https://pomodoro.iomdev.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pomodoro Focus Timer showing a 25 minute focus session" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pomodoro Focus Timer | Customisable Study Timer" />
+    <meta
+      name="twitter:description"
+      content="Set custom focus and break sessions with a free Pomodoro timer."
+    />
+    <meta name="twitter:image" content="https://pomodoro.iomdev.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Pomodoro Focus Timer showing a 25 minute focus session" />
+
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Pomodoro" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
 
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="apple-touch-icon" href="favicon.svg" />
-
-    <link rel="stylesheet" href="timer-theme.css" />
-    <link rel="stylesheet" href="style.css" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- React + ReactDOM via CDN -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.production.min.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
-    ></script>
-    <!-- Babel to compile JSX in the browser -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Pomodoro Focus Timer",
+        "url": "https://pomodoro.iomdev.com/",
+        "description": "A free, customisable Pomodoro timer with adjustable focus and break sessions.",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "Any",
+        "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+        "isAccessibleForFree": true
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
-
-    <script src="config.js"></script>
-    <script type="text/babel" data-presets="env,react" src="app.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
