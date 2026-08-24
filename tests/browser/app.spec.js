@@ -20,6 +20,10 @@ test("serves pre-rendered, indexable metadata and discovery files", async ({ pag
   expect(source).toContain("Pomodoro Focus Timer");
   expect(source).toContain(`Application version ${version}`);
   expect(source).toContain('rel="canonical" href="https://pomodoro.iomdev.com/"');
+  expect((source.match(/name="google-site-verification"/g) || []).length).toBe(1);
+  expect(source).toContain(
+    'content="adAkT2UKKHDeXXHAihEFblISGgokrVt3PskRnEBm2uc"',
+  );
 
   const robots = await request.get("/robots.txt");
   expect(robots.status()).toBe(200);
@@ -46,6 +50,10 @@ test("serves pre-rendered, indexable metadata and discovery files", async ({ pag
   await expect(page.locator('meta[name="description"]')).toHaveAttribute(
     "content",
     "Free, customisable Pomodoro focus timer with adjustable work and break sessions, saved settings, notifications and screen wake support on any device.",
+  );
+  await expect(page.locator('meta[name="google-site-verification"]')).toHaveAttribute(
+    "content",
+    "adAkT2UKKHDeXXHAihEFblISGgokrVt3PskRnEBm2uc",
   );
   await expect(page.locator(".app-version")).toHaveText(`v${version}`);
   const structuredData = JSON.parse(
