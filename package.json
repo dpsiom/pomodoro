@@ -1,0 +1,50 @@
+{
+  "name": "pomodoro-focus-timer",
+  "version": "3.5.0",
+  "private": true,
+  "description": "A responsive, customisable Pomodoro focus timer for desktop, tablet, and mobile.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && tsx scripts/prerender.jsx",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "test:seo": "node scripts/run-lighthouse.mjs",
+    "setup:browsers": "playwright install chromium",
+    "check": "npm run lint && npm run test && npm run build && npm run test:browser && npm run test:seo"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dpsiom/pomodoro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dpsiom/pomodoro/issues"
+  },
+  "homepage": "https://pomodoro.iomdev.com/",
+  "keywords": [
+    "pomodoro",
+    "focus-timer",
+    "productivity",
+    "react"
+  ],
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@vitejs/plugin-react": "6.1.0",
+    "chrome-launcher": "1.2.1",
+    "eslint": "10.9.0",
+    "globals": "16.4.0",
+    "lighthouse": "13.4.1",
+    "tsx": "4.23.12",
+    "vite": "8.2.2",
+    "vitest": "4.1.11"
+  }
+}

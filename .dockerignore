@@ -1,4 +1,12 @@
 .git
 .github
+.lighthouseci
+AGENTS.md
 README.md
 docs
+dist
+node_modules
+playwright-report
+test-results
+tests
+*.log

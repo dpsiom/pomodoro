@@ -1,111 +1,66 @@
 # Pomodoro Focus Timer
 
-Responsive Pomodoro timer for desktop, tablet, and mobile.
-Built as a static React app loaded from CDNs, with configurable sessions, browser notifications, sound alerts, and optional screen wake support.
+A responsive Pomodoro timer for desktop, tablet, and mobile, deployed at
+[pomodoro.iomdev.com](https://pomodoro.iomdev.com/). The production build is pre-rendered for
+fast, crawlable initial HTML and hydrates into an interactive React application.
 
-![Pomodoro Focus Timer screenshot](docs/app-screenshot.png)
+![Pomodoro Focus Timer](public/og-image.png)
 
 ## Features
 
-- Focus, short break, and long break modes
-- Default 25 / 5 / 30 minute session lengths
-- Automatic long break after 4 completed focus sessions
-- Custom session lengths and cycle length saved to `localStorage`
-- Audio chime when a session ends
-- Browser notifications when supported and permitted
-- Screen Wake Lock support on compatible browsers
-- Clean oval timer UI optimized for wide timer text
+- Focus, short-break, and long-break modes
+- Configurable session lengths stored in the browser
+- Automatic long break after a configurable number of focus sessions
+- Audio, browser notification, and Screen Wake Lock support
+- Responsive layout and visible deployed release version
+- Pre-rendered H1 and SEO metadata, sitemap, robots file, and structured data
 
-## Tech stack
+## Requirements
 
-- React 18 via CDN
-- ReactDOM 18 via CDN
-- Babel Standalone for in-browser JSX compilation
-- Plain CSS for layout, styling, and timer ring rendering
-- Static hosting friendly deployment model
+- Node.js 22 (`.nvmrc` is provided)
+- npm 11 or a compatible npm version
+- Chromium for browser and Lighthouse checks
 
-## Project structure
-
-```text
-index.html         Entry point
-app.js             Timer logic and React UI
-style.css          Main styles
-timer-theme.css    Timer sizing variables
-config.js          Runtime UI toggles
-favicon.svg        App icon
-Dockerfile         Static nginx image
-docs/
-  app-screenshot.png
-.github/
-  workflows/
-    docker-publish.yml
-```
-
-## Run locally
-
-Serve the project from the repo root:
+## Development
 
 ```bash
-python3 -m http.server 8000
+nvm use
+npm ci
+npm run setup:browsers
+npm run dev
 ```
 
-Then open:
-
-```text
-http://localhost:8000
-```
-
-Opening `index.html` directly can work, but browser features such as notifications are more reliable over `http://localhost`.
-
-## Configuration
-
-`config.js` exposes a small runtime toggle:
-
-```js
-window.POMODORO_UI = {
-  showTechPanel: true,
-};
-```
-
-Set `showTechPanel: false` to hide the "Notifications & screen" panel.
-
-## Using the app
-
-1. Open the app in your browser.
-2. Adjust session settings if you want something other than the defaults.
-3. Click `Start` to begin the timer.
-4. Let the app cycle automatically between focus and break sessions, or switch modes manually with the tabs.
-
-## Notifications and wake lock
-
-- The app requests browser notification permission only when you click the enable button in the optional tech panel.
-- On supported browsers, it uses the Screen Wake Lock API while the timer is running.
-- On iPad or iPhone, setting `Auto-Lock` to `Never` may still help during long sessions.
-
-## Docker
-
-Build and run the included nginx image:
+The development server prints its local URL. The most useful commands are:
 
 ```bash
-docker build -t pomodoro-timer:local .
-docker run --rm -p 8080:80 pomodoro-timer:local
+npm run lint          # Static checks
+npm test              # Unit tests
+npm run build         # Vite build plus React pre-render
+npm run test:browser  # Runtime, responsive, and crawlability checks
+npm run test:seo      # Lighthouse thresholds
+npm run check         # Complete local/CI suite
 ```
 
-Then open:
+The production output is generated in `dist/` and is intentionally not committed.
 
-```text
-http://localhost:8080
-```
+## Architecture
 
-The container image copies only the runtime files needed to serve the app.
+- `src/App.jsx` contains the React timer and settings UI.
+- `src/timer.js` contains independently tested timer utilities.
+- `scripts/prerender.jsx` injects the initial React markup into the Vite output.
+- `public/` contains crawl discovery files, icons, the manifest, and social preview.
+- `package.json` is the single source for the visible application version.
 
-## Deploy
+## Deployment
 
-This app is static, so it can be hosted on platforms such as:
+AWS Amplify monitors `main`. The checked-in `amplify.yml` installs pinned dependencies, runs
+the production build, and publishes `dist/`. After a deployment, the footer version and the
+live `robots.txt`/`sitemap.xml` endpoints provide quick release and crawlability checks.
 
-- GitHub Pages
-- AWS Amplify Hosting
-- S3 + CloudFront
-- Any nginx-based container or static file host
+The Docker workflow also publishes the same build to GitHub Container Registry as `latest`,
+the package semantic version, and a commit-SHA tag after the `main` quality workflow passes.
 
-The repo also includes a GitHub Actions workflow at `.github/workflows/docker-publish.yml` for publishing a container image to GitHub Container Registry.
+## Contribution workflow
+
+All changes start from a prioritised, labelled GitHub issue and are delivered through a pull
+request. See `AGENTS.md` for the exact agent and release requirements.

@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose a user-facing or engineering improvement.
+title: "Feature: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: Describe the outcome and who benefits.
+    validations:
+      required: true
+  - type: textarea
+    id: approach
+    attributes:
+      label: Proposed approach
+      description: Include constraints, alternatives, or examples if known.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority
+      options:
+        - P0 - production or crawl blocker
+        - P1 - high priority
+        - P2 - normal priority
+        - P3 - low priority
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: "- [ ] Observable outcome"
+    validations:
+      required: true
